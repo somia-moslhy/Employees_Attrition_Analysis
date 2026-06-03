@@ -54,7 +54,7 @@ Analyzes employee attrition data to answer one business question:
 
 ## Live Dashboard
 
-[View on Streamlit Community Cloud](https://your-app-link.streamlit.app](https://employeesattritionanalysis-8oyehtzk3vac2gs5qm3pzg.streamlit.app/))
+[View on Streamlit Community Cloud](https://employeesattritionanalysis-8oyehtzk3vac2gs5qm3pzg.streamlit.app/)
 
 ---
 
