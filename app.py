@@ -15,6 +15,8 @@ TEXT   = "#1a1d3a"
 df = pd.read_csv("combined.csv")
 
 # ── sidebar filters ───────────────────────────────────────
+st.sidebar.image("kayfa_logo.png", use_container_width=True)
+st.sidebar.markdown("---")
 st.sidebar.title("Filters")
 
 roles = ["All"] + sorted(df["job_role"].unique().tolist())
@@ -46,7 +48,19 @@ left_n     = int(df["attrition"].sum())
 stayed_n   = total - left_n
 rate       = round(left_n / total * 100, 1) if total > 0 else 0
 avg_income = round(df["monthly_income"].mean(), 0)
-cost_est   = round(left_n * avg_income * 6 / 1e6, 1)
+months_mapping = {"Entry": 6, "Mid": 12, "Senior": 24}
+
+cost_total = 0
+for level, months in months_mapping.items():
+    level_df_cost = df[df["job_level"] == level]
+    if len(level_df_cost) == 0:
+        continue
+    cost_total += level_df_cost["attrition"].sum() * level_df_cost["monthly_income"].mean() * months
+
+if cost_total >= 1e9:
+    cost_label = f"${round(cost_total / 1e9, 2)}B"
+else:
+    cost_label = f"${round(cost_total / 1e6, 1)}M"
 
 # ── header ────────────────────────────────────────────────
 st.title("Employee Attrition Analytics")
@@ -59,7 +73,7 @@ k1.metric("Total Employees",      f"{total:,}")
 k2.metric("Attrition Rate",       f"{rate}%")
 k3.metric("Retention Rate",       f"{round(100 - rate, 1)}%")
 k4.metric("Avg Monthly Income",   f"${avg_income:,.0f}")
-k5.metric("Est. Replacement Cost",f"${cost_est}M")
+k5.metric("Est. Replacement Cost", cost_label)
 
 st.divider()
 
@@ -201,8 +215,9 @@ st.divider()
 # chart 7 — cost by level
 st.subheader("Financial Impact")
 
+months_per_level = {"Entry": 6, "Mid": 12, "Senior": 24}
 cost_df = df.groupby("job_level", observed=True).apply(
-    lambda x: round(x["attrition"].sum() * x["monthly_income"].mean() * 6 / 1e6, 1)
+    lambda x: round(x["attrition"].sum() * x["monthly_income"].mean() * months_per_level.get(x.name, 6) / 1e6, 1)
 ).reindex(["Entry","Mid","Senior"]).reset_index()
 cost_df.columns = ["job_level","cost_M"]
 
