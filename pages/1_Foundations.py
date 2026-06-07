@@ -3,6 +3,8 @@ import pandas as pd
 import plotly.express as px
 import sys
 sys.path.append('..')
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils import load_data, render_sidebar, DARK, ACCENT, DANGER, GREEN, CHART
 TEXT  = "#ffffff"
 WHITE = "#ffffff"
