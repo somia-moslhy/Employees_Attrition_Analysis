@@ -31,7 +31,7 @@ Analyzes employee attrition data to answer one business question:
 ├── requirements.txt     # Dependencies
 ├── EDA_notebook.ipynb   # Google Colab notebook
 └── .streamlit/
-    └── config.toml      # Light mode config
+  
 ```
 
 ---
