@@ -3,12 +3,15 @@ import pandas as pd
 import plotly.express as px
 import sys
 sys.path.append('..')
-from utils import load_data, DARK, ACCENT, DANGER, GREEN, WHITE, TEXT, CHART, WLB_ORDER, JS_ORDER
+from utils import load_data, render_sidebar, DARK, ACCENT, DANGER, GREEN, CHART
+TEXT  = "#ffffff"
+WHITE = "#ffffff"
 
 st.set_page_config(page_title="Segmentation", layout="wide")
-st.sidebar.image("kayfa_logo.png", use_container_width=True)
 
-df = load_data()
+
+df_full = load_data()
+df      = render_sidebar(df_full)
 avg_rate = df['attrition'].mean() * 100
 
 st.title("Comparison & Segmentation")
@@ -39,7 +42,7 @@ fig = px.bar(pay_df, x="income_quartile", y="rate", color="Job Level",
 fig.update_traces(texttemplate="%{text}%", textposition="outside", textfont_color="#ffffff")
 fig.update_yaxes(range=[0, 80])
 fig.update_layout(**CHART, legend=dict(orientation="h", y=-0.2))
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
 
 st.info("**Insight:** Within every job level, income quartile moves attrition by at most 2 percentage points. Pay is not the driver — job level is. Entry sits at 63% regardless of salary. **Action:** Stop trying to retain Entry employees with pay rises alone. Invest in faster, clearer promotion paths to Mid level.")
 st.divider()
@@ -60,7 +63,7 @@ fig.add_hline(y=avg_rate, line_dash="dash", line_color=DANGER,
               annotation_position="top right")
 fig.update_yaxes(range=[38, 60])
 fig.update_layout(**CHART)
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
 
 st.info("**Insight:** Attrition peaks at years 3–5 (53.1%). Employees survive onboarding, gain experience, then leave when growth stalls. After 11 years loyalty rises sharply to 44%. **Action:** Focus retention resources on employees in years 3–10. A mid-career growth conversation at year 3 is the single most cost-effective HR intervention.")
 st.divider()
@@ -80,7 +83,7 @@ fig = px.density_heatmap(combo_df, x="work_life_balance", y="job_satisfaction", 
                                   "rate": "Attrition %"})
 fig.update_traces(textfont_color="#ffffff")
 fig.update_layout(**CHART)
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
 
 st.info("**Insight:** Low Satisfaction + Poor WLB = 67% attrition — the highest combination. Work-Life Balance is the stronger lever: Poor WLB pushes attrition above 55% regardless of satisfaction level. **Action:** Any employee reporting Poor or Fair WLB should trigger an immediate manager conversation, even if they express satisfaction with the job itself.")
 st.divider()
@@ -102,7 +105,7 @@ with c1:
     fig.update_traces(texttemplate="%{text}%", textposition="outside", textfont_color="#ffffff")
     fig.update_yaxes(range=[0, 80])
     fig.update_layout(**CHART, showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 with c2:
     age_df = df.groupby("age_group", observed=True)["attrition"].mean().reset_index()
@@ -116,7 +119,7 @@ with c2:
     fig.update_coloraxes(showscale=False)
     fig.update_yaxes(range=[0, 65])
     fig.update_layout(**CHART, showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 single_young = df[(df['marital_status']=='Single') & (df['age_group']=='18-25')]
 st.info(f"**Insight:** Single employees leave at 66.8% — nearly double married (36%). Single aged 18–25 hit **{single_young['attrition'].mean()*100:.1f}%** — the highest life-stage group in the dataset. **Action:** Design retention specifically for early-career single staff: mentorship, fast career tracks, and community belonging — not family-focused benefits.")

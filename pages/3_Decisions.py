@@ -3,12 +3,15 @@ import pandas as pd
 import plotly.express as px
 import sys
 sys.path.append('..')
-from utils import load_data, DARK, ACCENT, DANGER, GREEN, WHITE, TEXT, CHART
+from utils import load_data, render_sidebar, DARK, ACCENT, DANGER, GREEN, CHART
+TEXT  = "#ffffff"
+WHITE = "#ffffff"
 
 st.set_page_config(page_title="Decisions", layout="wide")
-st.sidebar.image("kayfa_logo.png", use_container_width=True)
 
-df = load_data()
+
+df_full = load_data()
+df      = render_sidebar(df_full)
 avg_rate = df['attrition'].mean() * 100
 
 st.title("Synthesis & Decision-Making")
@@ -36,7 +39,7 @@ with c1:
                   annotation_text=f"Company Average {avg_rate:.1f}%",
                   annotation_position="top right")
     fig.update_layout(**CHART, showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 with c2:
     opp_rows = []
@@ -57,7 +60,7 @@ with c2:
     fig.update_traces(texttemplate="%{text}%", textposition="outside", textfont_color="#ffffff")
     fig.update_yaxes(range=[0, 60])
     fig.update_layout(**CHART, legend=dict(orientation="h", y=-0.2))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 st.info("**Insight:** Zero to two promotions all cluster at ~49% attrition — no meaningful difference between them. The real drop comes at 3+ promotions (24%). The first two promotions do not retain — consistent, ongoing advancement does. **Action:** Ensure employees reach their third promotion within a clear, communicated timeframe. Make the path visible from day one.")
 st.divider()
@@ -91,7 +94,7 @@ fig.add_annotation(x=1, y=55,
     font=dict(size=11, color=TEXT), showarrow=False,
     bgcolor=WHITE, bordercolor=DANGER, borderpad=5)
 fig.update_layout(**CHART, showlegend=False)
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
 
 gap = round(hr_rate - avg_rate, 1)
 st.info(f"**Insight:** {hr_count:,} employees match this profile — large enough to act on. Their attrition rate of {hr_rate}% is **+{gap} pp above the company average**. All four factors (remote eligibility, overtime, WLB, marital support) are controllable. **Action:** Prioritize this group for immediate intervention. Fixing even two of the four factors would significantly reduce their risk.")
@@ -126,6 +129,6 @@ fig.update_traces(texttemplate="-%{text} pp", textposition="outside", textfont_c
 fig.update_coloraxes(showscale=False)
 fig.update_xaxes(range=[0, 35])
 fig.update_layout(**CHART, showlegend=False)
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
 
 st.info("**Insight — #1 Pick: Remote Work (-28 pp).** It is the single largest controllable lever in the dataset. The company currently offers remote work to only 19% of staff. Expanding access even to 38% would be the fastest, highest-impact action HR can take next quarter. **Rough estimate:** doubling remote eligibility while maintaining current attrition rates for remote workers could retain thousands of employees annually — each worth 6–12x their monthly salary in avoided replacement costs.")

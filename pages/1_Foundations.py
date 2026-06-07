@@ -3,12 +3,15 @@ import pandas as pd
 import plotly.express as px
 import sys
 sys.path.append('..')
-from utils import load_data, DARK, ACCENT, DANGER, GREEN, WHITE, TEXT, CHART
+from utils import load_data, render_sidebar, DARK, ACCENT, DANGER, GREEN, CHART
+TEXT  = "#ffffff"
+WHITE = "#ffffff"
 
 st.set_page_config(page_title="Foundations", layout="wide")
-st.sidebar.image("kayfa_logo.png", use_container_width=True)
 
-df = load_data()
+
+df_full = load_data()
+df      = render_sidebar(df_full)
 avg_rate = df['attrition'].mean() * 100
 
 st.title("Foundations")
@@ -30,7 +33,7 @@ with c1:
                  title="Overall Attrition Rate")
     fig.update_traces(textfont_color="#ffffff")
     fig.update_layout(**CHART)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 with c2:
     role_df = df.groupby("job_role")["attrition"].mean().reset_index()
@@ -44,7 +47,7 @@ with c2:
     fig.update_coloraxes(showscale=False)
     fig.update_xaxes(range=[0, 60])
     fig.update_layout(**CHART, showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 st.info("**Insight:** All departments sit within 2 percentage points of each other (46.8%–48.8%). This is not a department problem — it is a company-wide structural issue. Any solution must be applied at company level, not targeted at one team.")
 st.divider()
@@ -64,7 +67,7 @@ fig = px.bar(ot_df, x="overtime", y="rate", text="rate",
 fig.update_traces(texttemplate="%{text}%", textposition="outside", textfont_color="#ffffff")
 fig.update_yaxes(range=[0, 65])
 fig.update_layout(**CHART, showlegend=False)
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
 
 ot_gap = round(ot_df[ot_df['overtime']=='Overtime']['rate'].values[0] - ot_df[ot_df['overtime']=='No Overtime']['rate'].values[0], 1)
 ot_pct = round(df[df['overtime']=='Yes'].shape[0] / len(df) * 100, 1)
@@ -86,7 +89,7 @@ fig = px.bar(rw_df, x="remote_work", y="rate", text="rate",
 fig.update_traces(texttemplate="%{text}%", textposition="outside", textfont_color="#ffffff")
 fig.update_yaxes(range=[0, 65])
 fig.update_layout(**CHART, showlegend=False)
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
 
 remote_pct = round(df[df['remote_work']=='Yes'].shape[0] / len(df) * 100, 1)
 st.info(f"**Insight:** Remote = 24.7% vs On-site = 52.8% — a 28 pp gap, the largest single factor in the dataset. **Caveat:** Only {remote_pct}% of staff work remotely, so this finding reflects a small and possibly self-selected group. **Action:** Run a structured remote-eligibility pilot for roles where it is feasible and measure attrition impact after 6 months.")

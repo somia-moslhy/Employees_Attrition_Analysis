@@ -1,3 +1,4 @@
+import streamlit as st
 import pandas as pd
 
 DARK   = "#353b98"
@@ -5,13 +6,12 @@ ACCENT = "#8a91f2"
 DANGER = "#ff6b6b"
 GREEN  = "#43d9a0"
 WHITE  = "#ffffff"
-TEXT   = "#ffffff"   # always white — readable on both dark and light charts
+TEXT   = "#ffffff"
 
 WLB_ORDER   = ['Poor', 'Fair', 'Good', 'Excellent']
 JS_ORDER    = ['Low', 'Medium', 'High', 'Very High']
 LEVEL_ORDER = ['Entry', 'Mid', 'Senior']
 
-# transparent bg so chart inherits page theme — fixes dark mode text issue
 CHART = dict(
     plot_bgcolor  = "rgba(0,0,0,0)",
     paper_bgcolor = "rgba(0,0,0,0)",
@@ -20,6 +20,7 @@ CHART = dict(
     height        = 420,
 )
 
+@st.cache_data
 def load_data():
     df = pd.read_csv("combined.csv")
     df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_').str.replace('-', '_')
@@ -35,3 +36,35 @@ def load_data():
         bins=[17, 25, 35, 45, 60],
         labels=['18-25', '26-35', '36-45', '46-60'])
     return df
+
+
+def render_sidebar(df):
+    """Renders filters in sidebar and returns filtered dataframe."""
+    st.sidebar.image("kayfa_logo.png", width='stretch')
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### Filters")
+
+    roles = ["All"] + sorted(df["job_role"].unique().tolist())
+    sel_role = st.sidebar.selectbox("Job Role", roles)
+
+    levels = ["All"] + sorted(df["job_level"].unique().tolist())
+    sel_level = st.sidebar.selectbox("Job Level", levels)
+
+    remote_opts = ["All", "Yes", "No"]
+    sel_remote = st.sidebar.selectbox("Remote Work", remote_opts)
+
+    age_min = int(df["age"].min())
+    age_max = int(df["age"].max())
+    age_range = st.sidebar.slider("Age Range", age_min, age_max, (age_min, age_max))
+
+    st.sidebar.markdown("---")
+    st.sidebar.caption("Kayfa · AI & Data Analytics · Month 1 Week 1")
+
+    # apply filters
+    filtered = df.copy()
+    if sel_role   != "All": filtered = filtered[filtered["job_role"]   == sel_role]
+    if sel_level  != "All": filtered = filtered[filtered["job_level"]  == sel_level]
+    if sel_remote != "All": filtered = filtered[filtered["remote_work"] == sel_remote]
+    filtered = filtered[(filtered["age"] >= age_range[0]) & (filtered["age"] <= age_range[1])]
+
+    return filtered
